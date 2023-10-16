@@ -12,7 +12,7 @@ sPrompt BYTE "Enter the plain text: ", 0
 sKey BYTE "Enter the encryption key: ", 0
 sEncrypt BYTE "Cipher text: ", 0
 sDecrypt BYTE "Decrypted: ", 0
-buffer BYTE BUFMAX+1 DUP(0)
+buffer BYTE BUFMAX + 1 DUP(0)
 key BYTE BUFMAX + 1 DUP(0)
 bufSize DWORD ?
 keySize DWORD ?
@@ -37,13 +37,7 @@ TranslateString PROC
 L1:
 	mov eax, [edi]
 	xor dword ptr buffer[ecx], eax
-	cmp eax, dword ptr key[edi]
-	je Final
-	jne Next
-Next:
-	inc edi
-Final:
-	mov edi, OFFSET key
+	;key needs to repeat here, but idk how to
 	loop L1
 	mov edx, OFFSET buffer
 	call WriteString
