@@ -26,6 +26,16 @@ SetKey PROC
 	mov ecx, KEYMAX
 	call ReadString
 	mov keySize, eax
+	cmp bufSize, keySize
+	jg Greater
+	jl Less
+Less:
+	mov esi, OFFSET key
+	mov ecx, keySize - bufSize
+L3:
+	mov [esi]
+Greater:
+	
 	popad
 	ret
 SetKey ENDP
