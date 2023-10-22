@@ -26,16 +26,6 @@ SetKey PROC
 	mov ecx, KEYMAX
 	call ReadString
 	mov keySize, eax
-	cmp bufSize, keySize
-	jg Greater
-	jl Less
-Less:
-	mov esi, OFFSET key
-	mov ecx, keySize - bufSize
-L3:
-	mov [esi]
-Greater:
-	
 	popad
 	ret
 SetKey ENDP
@@ -43,14 +33,22 @@ SetKey ENDP
 TranslateString PROC
 	pushad
 	mov ecx, bufSize
-	mov edi, OFFSET key
+	mov edi, OFFSET key        
+	mov esi, OFFSET buffer     
+	mov ebx, 0              
 L1:
-	mov eax, [edi]
-	xor dword ptr buffer[ecx], eax
-	;key needs to repeat here, but idk how to
-	loop L1
+	mov al, [edi + ebx]       
+	xor byte ptr [esi], al     
+	inc ebx                   
+	cmp ebx, keySize               
+	jge L2               
+L2:
+	inc esi
+	mov ebx, 0
+	loop L1 
 	mov edx, OFFSET buffer
 	call WriteString
+	call Crlf
 	popad
 	ret
 TranslateString ENDP
@@ -78,6 +76,7 @@ main PROC
 	mov edx, OFFSET sDecrypt
 	call WriteString
 	call TranslateString
+	call WaitMsg
 	invoke ExitProcess,0
 main ENDP
 END main
