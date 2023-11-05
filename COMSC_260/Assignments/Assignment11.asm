@@ -16,6 +16,7 @@ main PROC
 	mov ecx, MAXCHAR
 	mov edx, OFFSET inputString
 	call ReadString
+	mov inputSize, eax
 	mov edx, OFFSET encryptPrompt
 	call WriteString
 	call EncodeString
@@ -25,35 +26,34 @@ main ENDP
 EncodeString PROC
 	pushad
 	mov esi, OFFSET inputString
-Beginning:
-	mov ecx, 10
-	mov eax, 0
-L1:
-	mov ebx, DWORD PTR key[eax]
-	test ebx, ebx
-	js Negative
+	mov ecx, 0
+	mov edi, 0
+startEncrypt:
+	cmp ecx, inputSize
+	jge finishEncrypt
+	cmp edi, 10
+	jl continueKey
+	mov edi, 0
+ContinueKey:	
 	push ecx
-	mov cl, key[eax]
-	ror esi, cl
-	inc esi
-	inc eax
+	mov al, [esi + ecx]
+	mov cl, key[edi]
+	js Left
+	ror al, cl
+	jmp EditString
+Left:
+	neg cl
+	rol al, cl
+EditString:
 	pop ecx
-	loop L1
-Negative:
-	push ecx
-	mov ecx, DWORD PTR key[eax]
-	shl ecx, TYPE DWORD
-	xor ecx, DWORD PTR key[eax]
-	rol esi, cl
-	inc esi
-	inc eax
-	pop ecx
-	loop L1
-	cmp esi, OFFSET inputString + LENGTHOF input	String
-	jg EndEncrypt
-	jmp Beginning
-EndEncrypt:
-	mov edx, OFFSET inputString
+	mov [esi + ecx], al
+	inc ecx
+	inc edi
+	jmp startEncrypt
+finishEncrypt:
+	;mov edx, OFFSET encryptPrompt
+	;call WriteString
+	mov edx, DWORD PTR OFFSET inputString
 	call WriteString
 	call Crlf
 	popad
@@ -62,6 +62,37 @@ EncodeString ENDP
 
 DecodeString PROC
 	pushad
+	mov esi, OFFSET inputString
+	mov ecx, 0
+	mov edi, 0
+startEncrypt:
+	cmp ecx, inputSize
+	jge finishEncrypt
+	cmp edi, 10
+	jl continueKey
+	mov edi, 0
+ContinueKey:	
+	push ecx
+	mov al, [esi + ecx]
+	mov cl, key[edi]
+	js Right
+	rol al, cl
+	jmp EditString
+Right:
+	neg cl
+	ror al, cl
+EditString:
+	pop ecx
+	mov [esi + ecx], al
+	inc ecx
+	inc edi
+	jmp startEncrypt
+finishEncrypt:
+	mov edx, OFFSET decryptPrompt
+	call WriteString
+	mov edx, OFFSET inputString
+	call WriteString
+	call Crlf
 	popad
 	ret
 DecodeString ENDP
