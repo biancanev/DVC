@@ -2,6 +2,7 @@ INCLUDE Irvine32.inc
 .data
 	prompt1 byte "The output from the recursive call", 0
 	prompt2 byte "The output from the loop call", 0
+	errorMsg BYTE "The factorial value is overflowed", 0
 	Factorial PROTO, multiplier:DWORD
 	Factorial_loop PROTO, multiplier:DWORD
 .code
@@ -9,15 +10,12 @@ main PROC
 mov edx, offset prompt1
 	call WriteString
 	call Crlf
-	invoke Factorial, 10 ; calculate factorial (eax)
-	call WriteDec ; display it
-	call Crlf
+	invoke Factorial, 15 ; calculate factorial (eax)
+	call PrintValue
 	mov edx, offset prompt2
 	call WriteString
-	call Crlf
-	invoke Factorial_loop, 10 ; calculate factorial (eax)
-	call WriteDec ; display it
-	call Crlf
+	invoke Factorial_loop, 15 ; calculate factorial (eax)
+	call PrintValue
 exit
 main ENDP
 Factorial PROC,
@@ -49,4 +47,16 @@ L1: cmp ecx, 0 ; check if ecx == 0 then quit
 L2: 
 	ret
 Factorial_loop ENDP
+PrintValue PROC
+	jo Overflowed
+	call WriteDec
+	call Crlf
+	ret
+Overflowed:
+	mov edx, OFFSET ErrorMsg
+	call WriteString
+	call Crlf
+	exit
+	ret
+PrintValue ENDP
 END main
