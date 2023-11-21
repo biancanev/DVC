@@ -7,14 +7,15 @@ INCLUDE Irvine32.inc
 	Factorial_loop PROTO, multiplier:DWORD
 .code
 main PROC
-mov edx, offset prompt1
+	mov edx, offset prompt1
 	call WriteString
 	call Crlf
-	invoke Factorial, 15 ; calculate factorial (eax)
+	invoke Factorial, 10 ; calculate factorial (eax)
 	call PrintValue
 	mov edx, offset prompt2
 	call WriteString
-	invoke Factorial_loop, 15 ; calculate factorial (eax)
+	call Crlf
+	invoke Factorial_loop, 10 ; calculate factorial (eax)
 	call PrintValue
 exit
 main ENDP
